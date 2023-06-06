@@ -8,7 +8,7 @@ composer require wilkques/console
 ````
 
 ## How to use
-1. Add PHP command file (path default ./Console)
+1. Add PHP command file (path default `./Console`)
     ```php
     <?php
 
