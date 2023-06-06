@@ -1,0 +1,15 @@
+{
+    "name": "wilkques/console",
+    "require": {
+        "wilkques/container": "^3.0.0",
+        "league/climate": "^3.8"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Wilkques\\Console\\": "src/"
+        }
+    }
+}
