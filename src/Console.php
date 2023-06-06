@@ -247,7 +247,7 @@ class Console
      */
     protected function handleCommands(array $commands)
     {
-        return \Willis\Console\Parser::parser($commands);
+        return \Wilkques\Console\Parser::parser($commands);
     }
 
     /**
