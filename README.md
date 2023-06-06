@@ -39,7 +39,7 @@ composer require wilkques/console
     }
     ```
 
-1. in terminal run touch artisan & Add PHP code
+1. in terminal run `touch artisan` & Add PHP code
     ```php
     require_once 'vendor/autoload.php';
 
