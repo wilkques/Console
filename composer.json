@@ -1,5 +1,7 @@
 {
     "name": "wilkques/console",
+    "license": "MIT",
+    "type": "library",
     "require": {
         "wilkques/container": "^3.0.0",
         "league/climate": "^3.8"
