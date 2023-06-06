@@ -135,7 +135,7 @@ abstract class Command implements Commandable
 
         array_shift($matches);
 
-        return \Willis\Console\Parser::parser($matches);
+        return \Wilkques\Console\Parser::parser($matches);
     }
 
     /**
