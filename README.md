@@ -8,7 +8,7 @@ composer require wilkques/console
 ````
 
 ## How to use
-1. Add PHP command file (path default `./Console`)
+1. Add PHP command file (path default ./Console)
     ```php
     <?php
 
@@ -32,6 +32,9 @@ composer require wilkques/console
          */
         public $description = "do something";
 
+        /**
+         * handle this command
+         */
         public function handle()
         {
             // do something
@@ -39,7 +42,7 @@ composer require wilkques/console
     }
     ```
 
-1. in terminal run `touch artisan` & Add PHP code
+1. in terminal run `vi artisan` & Add PHP code
     ```php
     require_once 'vendor/autoload.php';
 
