@@ -47,6 +47,13 @@ class Console
     protected $commandRootPath = './Console';
 
     /**
+     * composer.json path
+     * 
+     * @var string
+     */
+    protected $composerPath = './composer.json';
+
+    /**
      * @param string $root
      * 
      * @return static
@@ -199,6 +206,52 @@ class Console
     }
 
     /**
+     * @param string $composerPath
+     * 
+     * @return static
+     */
+    public function setComposerPath($composerPath = './composer.json')
+    {
+        $this->composerPath = $composerPath;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComposerPath()
+    {
+        return $this->composerPath;
+    }
+
+    /**
+     * @param string $path
+     * 
+     * @return string
+     */
+    protected function psr4($path)
+    {
+        $composerPath = $this->getComposerPath();
+
+        if (file_exists($composerPath)) {
+            $jsonString = file_get_contents($composerPath);
+
+            $json = json_decode($jsonString, true);
+
+            if (array_key_exists('autoload', $json) && array_key_exists('psr-4', $json['autoload'])) {
+                foreach ($json['autoload']['psr-4'] as $reNamespace => $namespace) {
+                    if (strtok($path, $namespace)) {
+                        $path = str_replace($namespace, $reNamespace, $path);
+                    }
+                }
+            }
+        }
+
+        return $path;
+    }
+
+    /**
      * Get the full command class name for a given command.
      *
      * @param  string  $path
@@ -208,15 +261,17 @@ class Console
      */
     protected function getCommandClass($path)
     {
+        $path = $this->psr4($path);
+
         $namespace = $this->getNamespace($path);
 
-        $command = str_replace(
+        $class = str_replace(
             ['./', '.php', '/'],
-            ['', '', '\\'],
+            ['\\', '', '\\'],
             $path
         );
 
-        return $namespace . '\\' . $command;
+        return $namespace . str_replace($namespace, '', $class);
     }
 
     /**

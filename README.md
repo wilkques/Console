@@ -52,6 +52,7 @@ composer require wilkques/console
 
     console()
     ->setCommandRootPath("<set console dir path>") // if you want change path
+    ->setComposerPath("<composer.json path>") // if you want change
     ->build()
     ->handle($command);  
     ```
