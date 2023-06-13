@@ -144,7 +144,7 @@ abstract class Command implements Commandable
     public function regexMatches()
     {
         preg_match_all(
-            '/^([^\s]+)\s+|\{([^\}:]+)(?::[^}]+)?\}|\-\-([^\s]+)(?:\=([^\s]+))?\s*:\s*([^\n]+)/', 
+            '/^([^\s]+)|\{([^\}:]+)(?::[^}]+)?\}|\-\-([^\s]+)(?:\=([^\s]+))?\s*:\s*([^\n]+)/', 
             $this->getSignaturet(), 
             $matches
         );
