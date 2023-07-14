@@ -181,6 +181,9 @@ class Console
         )->setArguments(
             $this->handleArguments($commandFlagArgument['params'], $signaturet['params'])
         )->handle();
+
+        // clean scoped
+        container()->forgetScopedInstances();
     }
 
     /**
