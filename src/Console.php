@@ -81,9 +81,7 @@ class Console
      */
     public function register($abstract, $object = null)
     {
-        !$object && $object = container($abstract);
-
-        static::$helpers = $this->fireCommand($object, $abstract);
+        static::$helpers = $this->helpersBuilding($abstract, $this->fireAbstract($abstract, $object));
 
         return $this;
     }
@@ -98,7 +96,9 @@ class Console
                 $this->getCommandRootPath()
             ),
             function ($item, $path) {
-                $item[] = $this->fireCommand($this->getCommandClass($path));
+                $abstract = $this->getCommandClass($path);
+
+                $item[] = $this->helpersBuilding($abstract, $this->fireAbstract($abstract));
 
                 return $item;
             }
@@ -109,14 +109,29 @@ class Console
 
     /**
      * @param string $abstract
+     * @param callable $callBack
+     * 
+     * @return \Willis\Console\Contracts\Commandable|\Willis\Console\Command
+     */
+    protected function fireAbstract($abstract, $callBack = null)
+    {
+        $callBack = $callBack ?: function () use ($abstract) {
+            return container($abstract);
+        };
+
+        container()->scoped($abstract, $callBack);
+
+        return container($abstract);
+    }
+
+    /**
+     * @param string $abstract
+     * @param \Willis\Console\Contracts\Commandable|\Willis\Console\Command $concrete
      * 
      * @return array
      */
-    protected function fireCommand($abstract)
+    protected function helpersBuilding($abstract, $concrete)
     {
-        /** @var \Willis\Console\Contracts\Commandable|\Willis\Console\Command */
-        $concrete = container($abstract);
-
         $helpers = $concrete->getHelper();
 
         $this->setCommandMapping($helpers['command'], $abstract);
