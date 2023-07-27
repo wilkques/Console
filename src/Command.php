@@ -11,10 +11,17 @@ abstract class Command implements Commandable
      * 
      * @var array
      */
+    protected $origins = [];
+
+    /**
+     * command flag merge Explanation
+     * 
+     * @var array
+     */
     protected $options = [];
 
     /**
-     * command arguments
+     * command arguments merge Explanation
      * 
      * @var array
      */
@@ -108,6 +115,46 @@ abstract class Command implements Commandable
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @param array $origins
+     * 
+     * @return static
+     */
+    public function setOrigins($origins)
+    {
+        $this->origins = $origins;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function origins()
+    {
+        return $this->origins;
+    }
+
+    /**
+     * @param string $key
+     * 
+     * @return string
+     */
+    public function origin($key)
+    {
+        return data_get($this->origins(), "options.{$key}");
+    }
+
+    /**
+     * @param string $key
+     * 
+     * @return bool
+     */
+    public function hasOrigin($key)
+    {
+        return data_get($this->origins(), "options.{$key}") ? true : false;
     }
 
     /**

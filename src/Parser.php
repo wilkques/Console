@@ -15,7 +15,7 @@ class Parser
     {
         $options = [];
 
-        $params = [];
+        $arguments = [];
 
         foreach ($tokens as $arg) {
             if (strpos($arg, '-') === 0) {
@@ -35,10 +35,10 @@ class Parser
 
                 $options[$key] = is_a_to($value);
             } else {
-                $params[] = $arg;
+                $arguments[] = $arg;
             }
         }
 
-        return compact('options', 'params');
+        return compact('options', 'arguments');
     }
 }

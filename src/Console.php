@@ -5,27 +5,6 @@ namespace Wilkques\Console;
 class Console
 {
     /**
-     * commands
-     * 
-     * @var array
-     */
-    public $commands = [];
-
-    /**
-     * depiction
-     * 
-     * @var array
-     */
-    public $depiction = [];
-
-    /**
-     * instance
-     * 
-     * @var array
-     */
-    static $instance = [];
-
-    /**
      * helpers
      * 
      * @var array
@@ -81,9 +60,7 @@ class Console
      */
     public function register($abstract, $object = null)
     {
-        !$object && $object = container($abstract);
-
-        static::$helpers = $this->fireCommand($object, $abstract);
+        static::$helpers = $this->helpersBuilding($abstract, $this->fireAbstract($abstract, $object));
 
         return $this;
     }
@@ -98,7 +75,9 @@ class Console
                 $this->getCommandRootPath()
             ),
             function ($item, $path) {
-                $item[] = $this->fireCommand($this->getCommandClass($path));
+                $abstract = $this->getCommandClass($path);
+
+                $item[] = $this->helpersBuilding($abstract, $this->fireAbstract($abstract));
 
                 return $item;
             }
@@ -109,14 +88,29 @@ class Console
 
     /**
      * @param string $abstract
+     * @param callable $callBack
+     * 
+     * @return \Willis\Console\Contracts\Commandable|\Willis\Console\Command
+     */
+    protected function fireAbstract($abstract, $callBack = null)
+    {
+        $callBack = $callBack ?: function () use ($abstract) {
+            return container($abstract);
+        };
+
+        container()->scoped($abstract, $callBack);
+
+        return container($abstract);
+    }
+
+    /**
+     * @param string $abstract
+     * @param \Willis\Console\Contracts\Commandable|\Willis\Console\Command $concrete
      * 
      * @return array
      */
-    protected function fireCommand($abstract)
+    protected function helpersBuilding($abstract, $concrete)
     {
-        /** @var \Willis\Console\Contracts\Commandable|\Willis\Console\Command */
-        $concrete = container($abstract);
-
         $helpers = $concrete->getHelper();
 
         $this->setCommandMapping($helpers['command'], $abstract);
@@ -150,6 +144,8 @@ class Console
 
         if (!$type) {
             echo $this->getHelpers();
+
+            exit;
         }
 
         !array_key_exists($type, $this->commandMapping) && die("no command");
@@ -161,11 +157,14 @@ class Console
 
         $commandFlagArgument = $this->handleCommands($commands);
 
-        $abstract->setOptions(
+        $abstract->setOrigins($commandFlagArgument)->setOptions(
             $this->handleOptions($commandFlagArgument['options'], $signaturet['options'])
         )->setArguments(
-            $this->handleArguments($commandFlagArgument['params'], $signaturet['params'])
+            $this->handleArguments($commandFlagArgument['arguments'], $signaturet['arguments'])
         )->handle();
+
+        // clean scoped
+        container()->forgetScopedInstances();
     }
 
     /**
@@ -176,8 +175,6 @@ class Console
         $climate = new \League\CLImate\CLImate;
 
         $climate->table(static::$helpers);
-
-        die;
     }
 
     /**
@@ -189,20 +186,15 @@ class Console
      */
     protected static function scanConsoleDir($dir)
     {
-        return array_reduce(scandir($dir), function ($item, $path) use ($dir) {
-            if (!in_array($path, array(".", ".."))) {
-                $findPath = $dir . DIRECTORY_SEPARATOR;
-                if (is_dir($findPath . $path)) {
-                    return static::scanConsoleDir($findPath . $path);
-                } else {
-                    if (preg_match('/php/i', $path)) {
-                        $item[] = $dir . DIRECTORY_SEPARATOR . $path;
-                    }
-                }
+        $item = [];
 
-                return $item;
+        foreach (dir_scan($dir) as $path) {
+            if (preg_match('/php/i', $path)) {
+                $item[] = $path;
             }
-        });
+        }
+        
+        return $item;
     }
 
     /**
