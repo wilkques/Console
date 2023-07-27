@@ -4,6 +4,7 @@
     "type": "library",
     "require": {
         "wilkques/container": "^3.0.0",
+        "wilkques/php-helper": "^3.1.0",
         "league/climate": "^3.8"
     },
     "autoload": {
