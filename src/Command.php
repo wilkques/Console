@@ -154,7 +154,7 @@ abstract class Command implements Commandable
      */
     public function hasOrigin($key)
     {
-        return data_get($this->origins(), "options.{$key}") ? true : false;
+        return isset($this->origins()["options"][$key]);
     }
 
     /**
