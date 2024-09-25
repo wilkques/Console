@@ -63,12 +63,13 @@ abstract class Command implements Commandable
 
     /**
      * @param string|int $key
+     * @param mixed|null $default
      * 
      * @return mixed
      */
-    public function option($key)
+    public function option($key, $default = null)
     {
-        return $this->options()[$key];
+        return array_get($this->options(), $key, $default);
     }
 
     /**
@@ -93,12 +94,13 @@ abstract class Command implements Commandable
 
     /**
      * @param string|int $key
+     * @param mixed|null $default
      * 
      * @return mixed
      */
-    public function argument($key)
+    public function argument($key, $default = null)
     {
-        return $this->arguments()[$key];
+        return array_get($this->arguments(), $key, $default);
     }
 
     /**
@@ -144,7 +146,7 @@ abstract class Command implements Commandable
      */
     public function origin($key)
     {
-        return data_get($this->origins(), "options.{$key}");
+        return array_get($this->origins(), "options.{$key}");
     }
 
     /**
@@ -154,7 +156,7 @@ abstract class Command implements Commandable
      */
     public function hasOrigin($key)
     {
-        return isset($this->origins()["options"][$key]);
+        return array_has($this->origins(), "options.{$key}");
     }
 
     /**
