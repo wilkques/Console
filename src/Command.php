@@ -11,21 +11,21 @@ abstract class Command implements Commandable
      * 
      * @var array
      */
-    protected $origins = [];
+    protected $origins = array();
 
     /**
      * command flag merge Explanation
      * 
      * @var array
      */
-    protected $options = [];
+    protected $options = array();
 
     /**
      * command arguments merge Explanation
      * 
      * @var array
      */
-    protected $arguments = [];
+    protected $arguments = array();
 
     /**
      * Command Explanation

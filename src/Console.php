@@ -2,6 +2,8 @@
 
 namespace Wilkques\Console;
 
+use Wilkques\Filesystem\Filesystem;
+
 class Console
 {
     /**
@@ -9,14 +11,14 @@ class Console
      * 
      * @var array
      */
-    static $helpers = [];
+    static $helpers = array();
 
     /**
      * command mapping
      * 
      * @var array
      */
-    protected $commandMapping = [];
+    protected $commandMapping = array();
 
     /**
      * console path
@@ -37,7 +39,7 @@ class Console
      * 
      * @return static
      */
-    public function setCommandRootPath(string $commandRootPath)
+    public function setCommandRootPath($commandRootPath)
     {
         $this->commandRootPath = $commandRootPath;
 
@@ -70,9 +72,12 @@ class Console
      */
     public function build()
     {
+        $filesystem = new Filesystem;
+
         static::$helpers = array_reduce(
             static::scanConsoleDir(
-                $this->getCommandRootPath()
+                $filesystem->directories($this->getCommandRootPath()),
+                $filesystem
             ),
             function ($item, $path) {
                 $abstract = $this->getCommandClass($path);
@@ -126,7 +131,7 @@ class Console
      * 
      * @return static
      */
-    public function setCommandMapping(string $command, string $class)
+    public function setCommandMapping($command, $class)
     {
         $this->commandMapping[$command] = $class;
 
@@ -180,20 +185,37 @@ class Console
     /**
      * scan console dir
      * 
-     * @param string $dir
+     * @param string|string[] $dirs
+     * @param Filesystem  $filesystem
      * 
      * @return array
      */
-    protected static function scanConsoleDir($dir)
+    protected static function scanConsoleDir($dirs, $filesystem)
     {
         $item = [];
 
-        foreach (dir_scan($dir) as $path) {
-            if (preg_match('/php/i', $path)) {
-                $item[] = $path;
+        foreach ($dirs as $path) {
+            if (!$path instanceof \SplFileInfo)
+                $path = new \SplFileInfo($path);
+
+            if ($path->isDir()) {
+                $item = array_merge($item, static::scanConsoleDir(
+                    $filesystem->searchInDirectory($path),
+                    $filesystem
+                ));
+
+                continue;
+            }
+
+            $extension = $path->getExtension();
+
+            $extension = strtolower($extension);
+
+            if ($extension == 'php') {
+                $item[] = $path->getPathname();
             }
         }
-        
+
         return $item;
     }
 
@@ -292,7 +314,7 @@ class Console
      * 
      * @return array
      */
-    protected function handleCommands(array $commands)
+    protected function handleCommands($commands)
     {
         return \Wilkques\Console\Parser::parser($commands);
     }
@@ -314,9 +336,9 @@ class Console
      * 
      * @return array
      */
-    protected function handleArguments(array $commandArgument, array $signaturetArgument)
+    protected function handleArguments($commandArgument, $signaturetArgument)
     {
-        return empty($commandArgument) ? [] :
+        return empty($commandArgument) ? array() :
             array_combine(
                 $signaturetArgument,
                 $commandArgument
