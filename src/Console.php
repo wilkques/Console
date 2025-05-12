@@ -2,6 +2,7 @@
 
 namespace Wilkques\Console;
 
+use Wilkques\Container\Container;
 use Wilkques\Filesystem\Filesystem;
 
 class Console
@@ -33,6 +34,31 @@ class Console
      * @var string
      */
     protected $composerPath = './composer.json';
+
+    /**
+     * @var Container
+     */
+    protected $container;
+
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    public function __construct(Container $container, Filesystem $filesystem)
+    {
+        $this->container = $container;
+
+        $this->filesystem = $filesystem;
+    }
+
+    /**
+     * @return static
+     */
+    public static function make()
+    {
+        return container('\Wilkques\Console\Console');
+    }
 
     /**
      * @param string $root
@@ -70,14 +96,12 @@ class Console
     /**
      * @return static
      */
-    public function build()
+    public function boot()
     {
-        $filesystem = new Filesystem;
-
         static::$helpers = array_reduce(
             static::scanConsoleDir(
-                $filesystem->directories($this->getCommandRootPath()),
-                $filesystem
+                $this->filesystem->directories($this->getCommandRootPath()),
+                $this->filesystem
             ),
             function ($item, $path) {
                 $abstract = $this->getCommandClass($path);
@@ -103,7 +127,7 @@ class Console
             return container($abstract);
         };
 
-        container()->scoped($abstract, $callBack);
+        $this->container->scoped($abstract, $callBack);
 
         return container($abstract);
     }
@@ -248,7 +272,7 @@ class Console
     {
         $composerPath = $this->getComposerPath();
 
-        if (file_exists($composerPath)) {
+        if ($this->filesystem->exists($composerPath)) {
             $jsonString = file_get_contents($composerPath);
 
             $json = json_decode($jsonString, true);
@@ -280,8 +304,8 @@ class Console
         $namespace = $this->getNamespace($path);
 
         $class = str_replace(
-            ['./', '.php', '/'],
-            ['\\', '', '\\'],
+            array('./', '.php', '/'),
+            array('\\', '', '\\'),
             $path
         );
 
@@ -298,13 +322,13 @@ class Console
      */
     protected function getNamespace($path)
     {
-        $namespace = trim(implode('\\', array_slice(explode('/', $path), -3, -1)), '\\');
+        $namespace = trim(implode('\\', array_slice(explode('\\', $path), 0, -1)), '\\');
 
         if (!$namespace) {
             throw new \InvalidArgumentException("Namespace not found in file: {$path}. Please add a namespace to your command and try again.");
         }
 
-        return str_replace('.', '', $namespace);
+        return str_replace(array('.', '/'), array('', '\\'), $namespace);
     }
 
     /**

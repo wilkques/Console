@@ -6,7 +6,8 @@
         "php": ">=5.5",
         "wilkques/container": ">=4.0.0",
         "wilkques/php-helper": ">=5.14.0",
-        "league/climate": ">=3.8"
+        "wilkques/Filesystem": ">=1.0.1",
+        "league/climate": ">=3.2.4"
     },
     "autoload": {
         "files": [

@@ -6,7 +6,7 @@ if (!function_exists('console')) {
      */
     function console()
     {
-        return container(\Wilkques\Console\Console::class);
+        return \Wilkques\Console\Console::make();
     }
 }
 
@@ -16,7 +16,7 @@ if (!function_exists('is_a_to')) {
      * 
      * @return string|bool
      */
-    function is_a_to(string $value, $callback = null)
+    function is_a_to($value, $callback = null)
     {
         if (in_array($value, ['false', 'true'])) {
             return $value == "true" ? true : ($value == "false" ? false : false);
