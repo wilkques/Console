@@ -124,12 +124,12 @@ class Console
     protected function fireAbstract($abstract, $callBack = null)
     {
         $callBack = $callBack ?: function () use ($abstract) {
-            return container($abstract);
+            return $this->container->make($abstract);
         };
 
         $this->container->scoped($abstract, $callBack);
 
-        return container($abstract);
+        return $this->container->make($abstract);
     }
 
     /**
@@ -180,7 +180,7 @@ class Console
         !array_key_exists($type, $this->commandMapping) && die("no command");
 
         /** @var \Console\Contracts\Commandable|\Willis\Console\Command */
-        $abstract = container($this->commandMapping[$type]);
+        $abstract = $this->container->make($this->commandMapping[$type]);
 
         $signaturet = $abstract->toArray();
 
@@ -193,7 +193,7 @@ class Console
         )->handle();
 
         // clean scoped
-        container()->forgetScopedInstances();
+        $this->container->forgetScopedInstances();
     }
 
     /**
