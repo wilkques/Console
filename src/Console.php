@@ -57,7 +57,9 @@ class Console
      */
     public static function make()
     {
-        return (new Container)->make('\Wilkques\Console\Console');
+        $container = Container::getInstance();
+
+        return $container->make('\\Wilkques\\Console\\Console', array($container));
     }
 
     /**
