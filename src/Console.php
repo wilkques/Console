@@ -59,7 +59,7 @@ class Console
     {
         $container = Container::getInstance();
 
-        return $container->make('\\Wilkques\\Console\\Console', array($container));
+        return $container->make(__CLASS__, array($container));
     }
 
     /**
