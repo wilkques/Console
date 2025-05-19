@@ -12,7 +12,7 @@ class Console
      * 
      * @var array
      */
-    static $helpers = array();
+    protected $helpers = array();
 
     /**
      * command mapping
@@ -59,7 +59,7 @@ class Console
     {
         $container = Container::getInstance();
 
-        return $container->make(__CLASS__, array($container));
+        return $container->make(__CLASS__);
     }
 
     /**
@@ -90,7 +90,7 @@ class Console
      */
     public function register($abstract, $object = null)
     {
-        static::$helpers = $this->helpersBuilding($abstract, $this->fireAbstract($abstract, $object));
+        $this->helpers = $this->helpersBuilding($abstract, $this->fireAbstract($abstract, $object));
 
         return $this;
     }
@@ -100,10 +100,9 @@ class Console
      */
     public function boot()
     {
-        static::$helpers = array_reduce(
-            static::scanConsoleDir(
-                $this->filesystem->directories($this->getCommandRootPath()),
-                $this->filesystem
+        $this->helpers = array_reduce(
+            $this->scanConsoleDir(
+                $this->filesystem->directories($this->getCommandRootPath())
             ),
             function ($item, $path) {
                 $abstract = $this->getCommandClass($path);
@@ -212,11 +211,10 @@ class Console
      * scan console dir
      * 
      * @param string|string[] $dirs
-     * @param Filesystem  $filesystem
      * 
      * @return array
      */
-    protected static function scanConsoleDir($dirs, $filesystem)
+    protected function scanConsoleDir($dirs)
     {
         $item = [];
 
@@ -225,9 +223,8 @@ class Console
                 $path = new \SplFileInfo($path);
 
             if ($path->isDir()) {
-                $item = array_merge($item, static::scanConsoleDir(
-                    $filesystem->searchInDirectory($path),
-                    $filesystem
+                $item = array_merge($item, $this->scanConsoleDir(
+                    $this->filesystem->searchInDirectory($path)
                 ));
 
                 continue;
