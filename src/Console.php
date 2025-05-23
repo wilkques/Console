@@ -204,7 +204,7 @@ class Console
     {
         $climate = new \League\CLImate\CLImate;
 
-        $climate->table(static::$helpers);
+        $climate->table($this->helpers);
     }
 
     /**
